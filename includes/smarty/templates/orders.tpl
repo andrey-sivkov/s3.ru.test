@@ -1,11 +1,10 @@
 <!doctype html>
 <html>
 <head>
-    <title>Products</title>
+    <title>Заказы</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <link href="/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/css/bootstrap-table.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/bootstrap-table.js"></script>
@@ -38,6 +37,7 @@
             pageSize:        5,
             pageList:        [5, 10, 50, 'All'],
             sortName:        'id',
+            sortOrder:       'desc',
             formatRecordsPerPage: function (a) {
                 return a +" заказов на странице";
             },
@@ -58,8 +58,8 @@
         return Number(value).toLocaleString() + ' руб.';
     }
 
-    function dateFormatter(value, row) {
-        return value.replace(/^(\d{4})\-(\d{2})\-(\d{2}) (.*)/, '$3.$2.$1 $4');
+    function dateFormatter(value) {
+        return value.replace(/^(\d+)\-(\d+)\-(\d+) (.*)$/, '$3.$2.$1 $4');
     }
 </script>
 </body>

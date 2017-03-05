@@ -10,6 +10,7 @@ class Order {
         $order_info = array(
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'],
+            'customer_address' => $data['customer_address'],
         );
         $order_id = insert_to_DB('orders', $order_info);
 
@@ -143,10 +144,10 @@ class Order {
      */
     public static function getOrderStatusHistory($order_id) {
         return select_to_DB("select osh.*, os.name as status 
-                                from orders_statuses_history osh 
-                                   left join orders_statuses os on os.id = osh.order_status_id
-                                where osh.order_id = '" . (int)$order_id . "'
-                                order by date_aded desc");
+                             from orders_statuses_history osh 
+                                 left join orders_statuses os on os.id = osh.order_status_id
+                             where osh.order_id = '" . (int)$order_id . "'
+                             order by osh.date_added desc");
     }
 
     /**
@@ -155,11 +156,11 @@ class Order {
      * @return mixed
      */
     public static function getOrderStatus($order_id) {
-        return select_row_DB("select osh.*, os.name as status 
-                                from orders_statuses_history osh 
-                                   left join orders_statuses os on os.id = osh.order_status_id
-                                where osh.order_id = '" . (int)$order_id . "'
-                                order by date_aded desc limit 1");
+        return select_cell_to_DB("select os.name 
+                                  from orders_statuses_history osh 
+                                      left join orders_statuses os on os.id = osh.order_status_id
+                                  where osh.order_id = '" . (int)$order_id . "'
+                                  order by osh.date_added desc limit 1");
     }
 
     /**

@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.30, created on 2017-03-05 21:43:44
+/* Smarty version 3.1.30, created on 2017-03-05 21:55:37
   from "D:\xampp\htdocs\s3.ru.test\includes\smarty\templates\index.tpl" */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.30',
-  'unifunc' => 'content_58bc78800512a2_36187713',
+  'unifunc' => 'content_58bc7b494b1787_23004280',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '013f9c2663958b063aa05afad9650b499d51e012' => 
     array (
       0 => 'D:\\xampp\\htdocs\\s3.ru.test\\includes\\smarty\\templates\\index.tpl',
-      1 => 1488746618,
+      1 => 1488747221,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_58bc78800512a2_36187713 (Smarty_Internal_Template $_smarty_tpl) {
+function content_58bc7b494b1787_23004280 (Smarty_Internal_Template $_smarty_tpl) {
 ?>
 <!doctype html>
 <html>
@@ -83,20 +83,28 @@ function content_58bc78800512a2_36187713 (Smarty_Internal_Template $_smarty_tpl)
     $(document).on('click', 'button.btn-buy', function() {
         var product_id = $(this).data('id');
         var product_name = $(this).data('content');
-        $('#modal-popup').find('.modal-title').text('Купить ' + product_name);
+        var product_price = $(this).data('price');
+        $('#modal-popup').find('.modal-title').html('Купить &laquo;' + product_name + '&raquo; по цене ' + priceFormatter(product_price));
         $('#modal-popup').find('select').attr('name', 'products[' + product_id + ']');
         $('#modal-popup').modal();
     });
 
     $(document).on('submit', '#modal-form', function (e) {
         e.preventDefault();
+        var passed = true;
         if (!$('input[name=customer_name]').val().trim()) {
-            $('input[name=customer_name]').parent().toggleClass('has-error');
-        } else if (!$('input[name=customer_email]').val().trim()) {
-            $('input[name=customer_email]').parent().toggleClass('has-error');
-        } else if (!$('textarea[name=customer_address]').val().trim()) {
+            $('input[name=customer_name]').parent().addClass('has-error');
+            passed = false;
+        }
+        if (!$('input[name=customer_email]').val().trim()) {
+            $('input[name=customer_email]').parent().addClass('has-error');
+            passed = false;
+        }
+        if (!$('textarea[name=customer_address]').val().trim()) {
             $('textarea[name=customer_address]').parent().addClass('has-error');
-        } else {
+            passed = false;
+        }
+        if (passed) {
             $.post('/', $(this).serialize() + '&make_order=1', function (data) {
                 $('#modal-popup').modal('hide');
                 alert('Ваш заказ #' + data['order_id'] + ' успешно принят.');
@@ -105,12 +113,18 @@ function content_58bc78800512a2_36187713 (Smarty_Internal_Template $_smarty_tpl)
         return false;
     });
 
+    $(document).on('keyup', 'input, textarea', function () {
+        if ($(this).val().trim()) {
+            $(this).parent().removeClass('has-error');
+        }
+    });
+
     function priceFormatter(value) {
         return Number(value).toLocaleString() + ' руб.';
     }
 
     function buyFormatter(value, row) {
-        return '<button type="button" class="btn btn-info btn-sm btn-buy" data-toggle="modal" data-target="modal-popup" data-content="' + row['name'] + '" data-id="' + row['id'] + '">Купить</button>';
+        return '<button type="button" class="btn btn-info btn-sm btn-buy" data-toggle="modal" data-target="modal-popup" data-content="' + row['name'] + '" data-id="' + row['id'] + '" data-price="' + row['price'] + '">Купить</button>';
     }
 <?php echo '</script'; ?>
 >

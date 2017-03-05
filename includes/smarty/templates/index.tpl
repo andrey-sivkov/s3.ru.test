@@ -1,11 +1,10 @@
 <!doctype html>
 <html>
 <head>
-    <title>Products</title>
+    <title>Товары</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <link href="/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/css/bootstrap-table.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/bootstrap-table.js"></script>
@@ -52,7 +51,8 @@
     $(document).on('click', 'button.btn-buy', function() {
         var product_id = $(this).data('id');
         var product_name = $(this).data('content');
-        $('#modal-popup').find('.modal-title').text('Купить ' + product_name);
+        var product_price = $(this).data('price');
+        $('#modal-popup').find('.modal-title').html('Купить &laquo;' + product_name + '&raquo; по цене ' + priceFormatter(product_price));
         $('#modal-popup').find('select').attr('name', 'products[' + product_id + ']');
         $('#modal-popup').modal();
     });
@@ -61,15 +61,15 @@
         e.preventDefault();
         var passed = true;
         if (!$('input[name=customer_name]').val().trim()) {
-            $('input[name=customer_name]').parent().toggleClass('has-error');
+            $('input[name=customer_name]').parent().addClass('has-error');
             passed = false;
         }
         if (!$('input[name=customer_email]').val().trim()) {
-            $('input[name=customer_email]').parent().toggleClass('has-error');
+            $('input[name=customer_email]').parent().addClass('has-error');
             passed = false;
         }
         if (!$('textarea[name=customer_address]').val().trim()) {
-            $('textarea[name=customer_address]').parent().toggleClass('has-error');
+            $('textarea[name=customer_address]').parent().addClass('has-error');
             passed = false;
         }
         if (passed) {
@@ -81,12 +81,18 @@
         return false;
     });
 
+    $(document).on('keyup', 'input, textarea', function () {
+        if ($(this).val().trim()) {
+            $(this).parent().removeClass('has-error');
+        }
+    });
+
     function priceFormatter(value) {
         return Number(value).toLocaleString() + ' руб.';
     }
 
     function buyFormatter(value, row) {
-        return '<button type="button" class="btn btn-info btn-sm btn-buy" data-toggle="modal" data-target="modal-popup" data-content="' + row['name'] + '" data-id="' + row['id'] + '">Купить</button>';
+        return '<button type="button" class="btn btn-info btn-sm btn-buy" data-toggle="modal" data-target="modal-popup" data-content="' + row['name'] + '" data-id="' + row['id'] + '" data-price="' + row['price'] + '">Купить</button>';
     }
 </script>
 
