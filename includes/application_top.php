@@ -12,6 +12,8 @@ require_once DIR_FS_CATALOG . '/includes/functions/database.php';
 require_once DIR_FS_CATALOG . '/includes/functions/smarty.php';
 // основные функции
 require_once DIR_FS_CATALOG . '/includes/functions/general.php';
+// инициализация класса Product
+require_once DIR_FS_CATALOG . '/includes/classes/Product.php';
 
 // инициализация класса Smarty
 $smarty = new Smarty();
@@ -20,4 +22,7 @@ $smarty->compile_dir   = DIR_FS_SMARTY . '/compile_dir';
 $smarty->force_compile = true;
 
 // установка соединения с БД
-$DB = DbSimple_Generic::connect('mysql://' . DB_SERVER_USERNAME . ':' . DB_SERVER_PASSWORD . '@' . DB_SERVER . '/' . DB_DATABASE) or die(mysql_error());
+$DB = DbSimple_Generic::connect('mysql://' . DB_SERVER_USERNAME . ':' . DB_SERVER_PASSWORD . '@' . DB_SERVER . '/' . DB_DATABASE);
+if ($DB->error['code']) die($DB->error['message']);
+
+query_to_DB("set names utf8");
