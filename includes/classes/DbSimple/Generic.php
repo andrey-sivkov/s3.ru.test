@@ -82,6 +82,9 @@ class DbSimple_Generic
      * Universal static function to connect ANY database using DSN syntax.
      * Choose database driver according to DSN. Return new instance
      * of this driver.
+     *
+     * @param $dsn
+     * @return resource
      */
     public static function& connect($dsn)
     {

@@ -15,10 +15,9 @@ require_once DIR_FS_CATALOG . '/includes/functions/general.php';
 
 // инициализация класса Smarty
 $smarty = new Smarty();
-$smarty->template_dir  = DIR_FS_CATALOG . '/includes/smarty/templates';
+$smarty->template_dir  = DIR_FS_SMARTY . '/templates';
+$smarty->compile_dir   = DIR_FS_SMARTY . '/compile_dir';
 $smarty->force_compile = true;
-$smarty->compile_dir   = DIR_FS_CATALOG . '/includes/smarty/compile_dir';
 
 // установка соединения с БД
-$DB = DbSimple_Generic::connect('mysql://' . DB_SERVER_USERNAME . ':' . DB_SERVER_PASSWORD . '@' . DB_SERVER . '/' . DB_DATABASE);
-
+$DB = DbSimple_Generic::connect('mysql://' . DB_SERVER_USERNAME . ':' . DB_SERVER_PASSWORD . '@' . DB_SERVER . '/' . DB_DATABASE) or die(mysql_error());

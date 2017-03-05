@@ -3,7 +3,7 @@ require_once DIR_FS_CATALOG . '/includes/classes/DbSimple/Generic.php';
 
 /**
  * @param $function
- * @param bool $args
+ * @param $args
  * @return mixed
  */
 function load_function_db($function, $args = array()) {
@@ -34,7 +34,7 @@ function select_row_to_DB() {
  * @param $sql
  * @param $total
  * @param $page_offset
- * @param int $number_row_page
+ * @param $number_row_page
  * @return mixed
  */
 function select_page_to_DB($sql, &$total, $page_offset, $number_row_page = 10) {
@@ -101,7 +101,7 @@ function new_id($table) {
 /**
  * подсчет всего количества ячеек в таблице
  * @param $table
- * @param bool $where
+ * @param $where
  * @return mixed
  */
 function count_cell($table, $where = false) {
