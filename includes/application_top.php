@@ -14,6 +14,8 @@ require_once DIR_FS_CATALOG . '/includes/functions/smarty.php';
 require_once DIR_FS_CATALOG . '/includes/functions/general.php';
 // инициализация класса Product
 require_once DIR_FS_CATALOG . '/includes/classes/Product.php';
+// инициализация класса Order
+require_once DIR_FS_CATALOG . '/includes/classes/Order.php';
 
 // инициализация класса Smarty
 $smarty = new Smarty();

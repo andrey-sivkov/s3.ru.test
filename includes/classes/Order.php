@@ -2,7 +2,9 @@
 class Order {
 
     /**
+     * Новый заказ
      * @param $data
+     * @return int
      */
     public static function createOrder($data) {
         $order_info = array(
@@ -25,9 +27,12 @@ class Order {
 
         self::updateOrderTotalSum($order_id);
         self::updateOrderStatusHistory($order_id, 0, $data['comments']);
+
+        return $order_id;
     }
 
     /**
+     * Обновление заказа
      * @param $data
      * @param $order_id
      */
@@ -53,6 +58,7 @@ class Order {
     }
 
     /**
+     * Обновление итоговой суммы заказа
      * @param $order_id
      * @return bool
      */
@@ -65,6 +71,7 @@ class Order {
     }
 
     /**
+     * Добавление записи в историяю заказа
      * @param $order_id
      * @param int $order_status_id
      * @param string $comments
@@ -83,6 +90,7 @@ class Order {
     }
 
     /**
+     * Получение id статуса заказа, выставляемого по умолчанию
      * @return bool
      */
     public static function getOrderDefaultStatus() {
@@ -93,6 +101,7 @@ class Order {
     }
 
     /**
+     * Список статусов заказов с id статуса в качестве ключа
      * @return array
      */
     public static function getOrdersStatusesList() {
@@ -106,6 +115,7 @@ class Order {
     }
 
     /**
+     * Инофрмация о заказе
      * @param $order_id
      * @return array
      */
@@ -118,6 +128,7 @@ class Order {
     }
 
     /**
+     * Список товаров в заказе
      * @param $order_id
      * @return array
      */
@@ -126,6 +137,7 @@ class Order {
     }
 
     /**
+     * История изменения статуса заказа
      * @param $order_id
      * @return mixed
      */
@@ -138,9 +150,28 @@ class Order {
     }
 
     /**
+     * Текущий статус заказа
+     * @param $order_id
+     * @return mixed
+     */
+    public static function getOrderStatus($order_id) {
+        return select_row_DB("select osh.*, os.name as status 
+                                from orders_statuses_history osh 
+                                   left join orders_statuses os on os.id = osh.order_status_id
+                                where osh.order_id = '" . (int)$order_id . "'
+                                order by date_aded desc limit 1");
+    }
+
+    /**
+     * Список заказов и их статусов
      * @return array
      */
     public static function getOrdersList() {
-        return (array)select_to_DB("select * from orders order by date_added desc");
+        $orders = (array)select_to_DB("select * from orders order by date_added desc");
+        foreach ($orders as $k => $order) {
+            $orders[$k]['status'] = self::getOrderStatus($order['id']);
+        }
+
+        return $orders;
     }
 }

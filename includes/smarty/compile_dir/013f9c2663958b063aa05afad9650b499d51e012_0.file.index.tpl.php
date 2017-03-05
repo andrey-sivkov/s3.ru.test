@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.30, created on 2017-03-05 18:29:06
+/* Smarty version 3.1.30, created on 2017-03-05 21:43:44
   from "D:\xampp\htdocs\s3.ru.test\includes\smarty\templates\index.tpl" */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.30',
-  'unifunc' => 'content_58bc4ae2b52e85_91816047',
+  'unifunc' => 'content_58bc78800512a2_36187713',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '013f9c2663958b063aa05afad9650b499d51e012' => 
     array (
       0 => 'D:\\xampp\\htdocs\\s3.ru.test\\includes\\smarty\\templates\\index.tpl',
-      1 => 1488734944,
+      1 => 1488746618,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_58bc4ae2b52e85_91816047 (Smarty_Internal_Template $_smarty_tpl) {
+function content_58bc78800512a2_36187713 (Smarty_Internal_Template $_smarty_tpl) {
 ?>
 <!doctype html>
 <html>
@@ -46,7 +46,7 @@ function content_58bc4ae2b52e85_91816047 (Smarty_Internal_Template $_smarty_tpl)
     <table id="products-table" data-pagination="true" class="">
         <thead>
             <tr>
-                <th data-field="id" class="id_column">#</th>
+                <th data-field="id">#</th>
                 <th data-field="name" data-sortable="true">Наименование</th>
                 <th data-field="price" data-sortable="true" data-formatter="priceFormatter">Цена</th>
                 <th data-field="phone_number" data-formatter="buyFormatter">Купить</th>
@@ -80,15 +80,74 @@ function content_58bc4ae2b52e85_91816047 (Smarty_Internal_Template $_smarty_tpl)
         });
     });
 
+    $(document).on('click', 'button.btn-buy', function() {
+        var product_id = $(this).data('id');
+        var product_name = $(this).data('content');
+        $('#modal-popup').find('.modal-title').text('Купить ' + product_name);
+        $('#modal-popup').find('select').attr('name', 'products[' + product_id + ']');
+        $('#modal-popup').modal();
+    });
+
+    $(document).on('submit', '#modal-form', function (e) {
+        e.preventDefault();
+        if (!$('input[name=customer_name]').val().trim()) {
+            $('input[name=customer_name]').parent().toggleClass('has-error');
+        } else if (!$('input[name=customer_email]').val().trim()) {
+            $('input[name=customer_email]').parent().toggleClass('has-error');
+        } else if (!$('textarea[name=customer_address]').val().trim()) {
+            $('textarea[name=customer_address]').parent().addClass('has-error');
+        } else {
+            $.post('/', $(this).serialize() + '&make_order=1', function (data) {
+                $('#modal-popup').modal('hide');
+                alert('Ваш заказ #' + data['order_id'] + ' успешно принят.');
+            }, 'json');
+        }
+        return false;
+    });
+
     function priceFormatter(value) {
         return Number(value).toLocaleString() + ' руб.';
     }
 
     function buyFormatter(value, row) {
-        return Number(value).toLocaleString() + ' руб.';
+        return '<button type="button" class="btn btn-info btn-sm btn-buy" data-toggle="modal" data-target="modal-popup" data-content="' + row['name'] + '" data-id="' + row['id'] + '">Купить</button>';
     }
 <?php echo '</script'; ?>
 >
+
+<div class="modal fade" tabindex="-1" id="modal-popup">
+    <div class="modal-dialog">
+        <form id="modal-form" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Купить</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Выберите кол-во:
+                        <select class="form-control" name="">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </p>
+                    <p><input type="text" name="customer_name" class="form-control" value="" placeholder="Ваше имя"></p>
+                    <p><input type="text" name="customer_email" class="form-control" value="" placeholder="Контактный e-mail"></p>
+                    <p><textarea name="customer_address" class="form-control" placeholder="Адрес доставки"></textarea></p>
+                    <p><textarea name="comments" class="form-control" placeholder="Комментарии к заказу"></textarea></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <input type="submit" class="btn btn-info" name="make_order" value="Сделать заказ">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html><?php }
 }
