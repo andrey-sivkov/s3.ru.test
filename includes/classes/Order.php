@@ -55,7 +55,10 @@ class Order {
         }
 
         self::updateOrderTotalSum($order_id);
-        self::updateOrderStatusHistory($order_id, $order_status_id, $data['comments']);
+
+        $order_status = self::getOrderStatus($order_id);
+        if ($order_status['status_id'] != $order_status_id || !empty($data['comments']))
+            self::updateOrderStatusHistory($order_id, $order_status_id, $data['comments']);
     }
 
     /**
@@ -121,9 +124,10 @@ class Order {
      * @return array
      */
     public static function getOrderInfo($order_id) {
-        if ($order = select_cell_to_DB("select * from orders where id = '" . (int)$order_id . "'")) {
+        if ($order = select_row_to_DB("select * from orders where id = '" . (int)$order_id . "'")) {
             $order['products'] = self::getOrderProducts($order_id);
             $order['history'] = self::getOrderStatusHistory($order_id);
+            $order['status'] = self::getOrderStatus($order_id);
         }
         return $order;
     }
@@ -134,7 +138,7 @@ class Order {
      * @return array
      */
     public static function getOrderProducts($order_id) {
-        return (array)select_cell_to_DB("select * from orders_products where order_id = '" . (int)$order_id . "'");
+        return (array)select_to_DB("select * from orders_products where order_id = '" . (int)$order_id . "'");
     }
 
     /**
@@ -156,7 +160,7 @@ class Order {
      * @return mixed
      */
     public static function getOrderStatus($order_id) {
-        return select_cell_to_DB("select os.name 
+        return select_row_to_DB("select os.id as status_id, os.name as status_name 
                                   from orders_statuses_history osh 
                                       left join orders_statuses os on os.id = osh.order_status_id
                                   where osh.order_id = '" . (int)$order_id . "'
@@ -170,7 +174,8 @@ class Order {
     public static function getOrdersList() {
         $orders = (array)select_to_DB("select * from orders order by date_added desc");
         foreach ($orders as $k => $order) {
-            $orders[$k]['status'] = self::getOrderStatus($order['id']);
+            $order_status = self::getOrderStatus($order['id']);
+            $orders[$k]['status'] = $order_status['status_name'];
         }
 
         return $orders;

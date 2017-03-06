@@ -12,6 +12,83 @@
 <body id="top" class="page">
 <div class="header"></div>
 <div class="content" style="width: 50%; margin: auto;">
+    {if $smarty.get.id}
+    <table class="table" width="100%">
+        <thead>
+        <tr>
+            <th colspan="2">Заказ #{$smarty.get.id} от {date('d.m.Y H:i', $order.date_added|strtotime)}</th>
+        </tr>
+        </thead>
+        <tr>
+            <td>Покупатель:</td>
+            <td>{$order.customer_name} (<a href="mailto:{$order.customer_email}">{$order.customer_email}</a>)</td>
+        </tr>
+        <tr>
+            <td>Адрес доставки:</td>
+            <td><textare class="form-control" style="height: 50px" name="customer_address">{$order.customer_address|nl2br}</textare></td>
+        </tr>
+    </table>
+    <table class="table" width="100%">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Наименование</th>
+            <th>Цена</th>
+            <th>Кол-во</th>
+            <th>Удалить</th>
+        </tr>
+        </thead>
+        {foreach from=$order.products item=v key=k}
+        <tr>
+            <td>{$k + 1}</td>
+            <td>{$v.product_name}</td>
+            <td>{$v.product_price}</td>
+            <td><input type="text" class="form-control" name="products[{$v.id}]" value="{$v.product_quantity}" style="width: 40px;" maxlength="1"></td>
+            <td>&times;</td>
+        </tr>
+        {/foreach}
+    </table>
+        <table class="table" width="100%">
+            <thead>
+            <tr>
+                <th>Изменить статус</th>
+                <th>Оставить комментарий</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>
+                    <select name="">
+                        {foreach from=$orders_statuses item=v key=k}
+                            <option value="{$k}"{if $k==$order.status.status_id} selected{/if}>{$v}</option>
+                        {/foreach}
+                    </select>
+                </td>
+                <td><textare class="form-control" style="height: 50px" name="comments" placeholder="Оставьте здесь ваши комментарии"></textare></td>
+            </tr>
+        </table>
+        <div style="text-align: right;">
+            <button class="btn btn-default">Отменить</button>
+            <input type="submit" class="btn btn-info" name="save" value="Сохранить изменения">
+        </div><br>
+        <table class="table" width="100%">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Дата / время</th>
+                <th>Статус</th>
+                <th>Комментрий</th>
+            </tr>
+            </thead>
+            {foreach from=$order.history item=v key=k}
+            <tr>
+                <td>{$k + 1}</td>
+                <td>{date('d.m.Y H:i', $v.date_added|strtotime)}</td>
+                <td>{$v.status}</td>
+                <td>{$v.comments|nl2br}</td>
+            </tr>
+            {/foreach}
+        </table>
+    {else}
     <table id="orders-table" data-pagination="true">
         <thead>
             <tr>
@@ -23,44 +100,45 @@
             </tr>
         </thead>
     </table>
+    <script>
+        $(document).ready(function() {
+            $('#orders-table').bootstrapTable({
+                url:             '/orders.php',
+                method:          'post',
+                queryParams:     { get_orders: 1 },
+                queryParamsType: 'limit',
+                contentType:     'application/x-www-form-urlencoded',
+                uniqueId:        'id',
+                pageSize:        5,
+                pageList:        [5, 10, 50, 'All'],
+                sortName:        'id',
+                sortOrder:       'desc',
+                formatRecordsPerPage: function (a) {
+                    return a +" заказов на странице";
+                },
+                formatShowingRows: function (a, b, d) {
+                    return "Показано с " + a + " по " + b + " из " + d + " заказов";
+                },
+                formatDetailPagination: function (a) {
+                    return "показано " + a + " заказов";
+                }
+            });
+        });
+
+        function customerFormatter(value, row) {
+            return '<a href="/orders.php?id=' + row['id'] + '">' + value + '</a>';
+        }
+
+        function priceFormatter(value) {
+            return Number(value).toLocaleString() + ' руб.';
+        }
+
+        function dateFormatter(value) {
+            return value.replace(/^(\d+)\-(\d+)\-(\d+) (.*)$/, '$3.$2.$1 $4');
+        }
+    </script>
+    {/if}
 </div>
 <div class="footer"></div>
-<script>
-    $(document).ready(function() {
-        $('#orders-table').bootstrapTable({
-            url:             '/orders.php',
-            method:          'post',
-            queryParams:     { get_orders: 1 },
-            queryParamsType: 'limit',
-            contentType:     'application/x-www-form-urlencoded',
-            uniqueId:        'id',
-            pageSize:        5,
-            pageList:        [5, 10, 50, 'All'],
-            sortName:        'id',
-            sortOrder:       'desc',
-            formatRecordsPerPage: function (a) {
-                return a +" заказов на странице";
-            },
-            formatShowingRows: function (a, b, d) {
-                return "Показано с " + a + " по " + b + " из " + d + " заказов";
-            },
-            formatDetailPagination: function (a) {
-                return "показано " + a + " заказов";
-            }
-        });
-    });
-
-    function customerFormatter(value, row) {
-        return '<a href="/orders.php?id=' + row['id'] + '">' + value + '</a>';
-    }
-
-    function priceFormatter(value) {
-        return Number(value).toLocaleString() + ' руб.';
-    }
-
-    function dateFormatter(value) {
-        return value.replace(/^(\d+)\-(\d+)\-(\d+) (.*)$/, '$3.$2.$1 $4');
-    }
-</script>
 </body>
 </html>
