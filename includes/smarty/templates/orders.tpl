@@ -3,51 +3,55 @@
 <head>
     <title>Заказы</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link href="/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="/css/bootstrap-table.min.css" rel="stylesheet" />
+    <link href="./css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./css/bootstrap-table.min.css" rel="stylesheet" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/bootstrap-table.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/bootstrap-table.js"></script>
 </head>
 <body id="top" class="page">
 <div class="header"></div>
 <div class="content" style="width: 50%; margin: auto;">
     {if $smarty.get.id}
-    <table class="table" width="100%">
-        <thead>
-        <tr>
-            <th colspan="2">Заказ #{$smarty.get.id} от {date('d.m.Y H:i', $order.date_added|strtotime)}</th>
-        </tr>
-        </thead>
-        <tr>
-            <td>Покупатель:</td>
-            <td>{$order.customer_name} (<a href="mailto:{$order.customer_email}">{$order.customer_email}</a>)</td>
-        </tr>
-        <tr>
-            <td>Адрес доставки:</td>
-            <td><textare class="form-control" style="height: 50px" name="customer_address">{$order.customer_address|nl2br}</textare></td>
-        </tr>
-    </table>
-    <table class="table" width="100%">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Наименование</th>
-            <th>Цена</th>
-            <th>Кол-во</th>
-            <th>Удалить</th>
-        </tr>
-        </thead>
-        {foreach from=$order.products item=v key=k}
-        <tr>
-            <td>{$k + 1}</td>
-            <td>{$v.product_name}</td>
-            <td>{$v.product_price}</td>
-            <td><input type="text" class="form-control" name="products[{$v.id}]" value="{$v.product_quantity}" style="width: 40px;" maxlength="1"></td>
-            <td>&times;</td>
-        </tr>
-        {/foreach}
-    </table>
+    <form id="order-form">
+        <input type="hidden" name="order_id" value="{$smarty.get.id}">
+        <table class="table" width="100%">
+            <thead>
+            <tr>
+                <th colspan="2">Заказ #{$smarty.get.id} от {date('d.m.Y H:i', $order.date_added|strtotime)}</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>Покупатель:</td>
+                <td><input type="text" name="customer_name" class="form-control" value="{$order.customer_name}"></td>
+            </tr>
+            <tr>
+                <td>E-mail:</td>
+                <td><input type="text" name="customer_email" class="form-control" value="{$order.customer_email}"></td>
+            </tr>
+            <tr>
+                <td>Адрес доставки:</td>
+                <td><textarea class="form-control" style="height: 50px" name="customer_address">{$order.customer_address|nl2br}</textarea></td>
+            </tr>
+        </table>
+        <table class="table" width="100%">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Наименование</th>
+                <th>Цена</th>
+                <th>Кол-во</th>
+            </tr>
+            </thead>
+            {foreach from=$order.products item=v key=k}
+            <tr>
+                <td>{$k + 1}</td>
+                <td>{$v.product_name}</td>
+                <td><input type="text" class="form-control" name="products[{$v.id}][price]" value="{$v.product_price}" style="width: 80px;" maxlength="6"></td>
+                <td><input type="text" class="form-control" name="products[{$v.id}][quantity]" value="{$v.product_quantity}" style="width: 40px;" maxlength="1"></td>
+            </tr>
+            {/foreach}
+        </table>
         <table class="table" width="100%">
             <thead>
             <tr>
@@ -57,7 +61,7 @@
             </thead>
             <tr>
                 <td>
-                    <select name="">
+                    <select class="form-control" name="order_status_id">
                         {foreach from=$orders_statuses item=v key=k}
                             <option value="{$k}"{if $k==$order.status.status_id} selected{/if}>{$v}</option>
                         {/foreach}
@@ -67,7 +71,7 @@
             </tr>
         </table>
         <div style="text-align: right;">
-            <button class="btn btn-default">Отменить</button>
+            <button class="btn btn-default btn-cancel">Отменить</button>
             <input type="submit" class="btn btn-info" name="save" value="Сохранить изменения">
         </div><br>
         <table class="table" width="100%">
@@ -88,6 +92,26 @@
             </tr>
             {/foreach}
         </table>
+    </form>
+    <script>
+        $(document).ready(function() {
+            $('button.btn-cancel').click(function () {
+                window.location.href = './orders.php';
+            });
+
+            $('#order-form').submit(function (e) {
+                e.preventDefault();
+                $.post('./orders.php', $(this).serialize(), function (result) {
+                    if (result['result']) {
+                        alert('Заказ успешно обновлен!');
+                        window.location.href = './orders.php';
+                    } else {
+                        alert('При обновлении заказа произошла ошибка!');
+                    }
+                }, 'json');
+            });
+        });
+    </script>
     {else}
     <table id="orders-table" data-pagination="true">
         <thead>
@@ -103,7 +127,7 @@
     <script>
         $(document).ready(function() {
             $('#orders-table').bootstrapTable({
-                url:             '/orders.php',
+                url:             './orders.php',
                 method:          'post',
                 queryParams:     { get_orders: 1 },
                 queryParamsType: 'limit',
@@ -126,7 +150,7 @@
         });
 
         function customerFormatter(value, row) {
-            return '<a href="/orders.php?id=' + row['id'] + '">' + value + '</a>';
+            return '<a href="./orders.php?id=' + row['id'] + '">' + value + '</a>';
         }
 
         function priceFormatter(value) {

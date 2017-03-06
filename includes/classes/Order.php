@@ -36,19 +36,22 @@ class Order {
      * Обновление заказа
      * @param $data
      * @param $order_id
+     * @return bool
      */
     public static function updateOrder($data, $order_id) {
-        $order_status_id = $data['order_status_id'];
         $order_info = array(
-            //'customer_name' => $data['customer_name'],
-            //'customer_email' => $data['customer_email'],
+            'customer_name' => $data['customer_name'],
+            'customer_email' => $data['customer_email'],
             'customer_address' => $data['customer_address'],
             'last_modified' => date('Y-m-d H:i:s')
         );
-        update_to_DB('orders', $order_info, array('id' => $order_id));
+        $result = update_to_DB('orders', $order_info, array('id' => $order_id));
 
-        foreach ($data['products'] as $order_product_id => $product_quantity) {
+        foreach ($data['products'] as $order_product_id => $product_data) {
+            $product_price = (float)$product_data['price'];
+            $product_quantity = (int)$product_data['quantity'];
             $order_product = array(
+                'product_price' => $product_price,
                 'product_quantity' => $product_quantity,
             );
             update_to_DB('orders_products', $order_product, array('id' => $order_product_id));
@@ -57,8 +60,10 @@ class Order {
         self::updateOrderTotalSum($order_id);
 
         $order_status = self::getOrderStatus($order_id);
-        if ($order_status['status_id'] != $order_status_id || !empty($data['comments']))
-            self::updateOrderStatusHistory($order_id, $order_status_id, $data['comments']);
+        if ($order_status['status_id'] != $data['order_status_id'] || !empty($data['comments']))
+            self::updateOrderStatusHistory($order_id, $data['order_status_id'], $data['comments']);
+
+        return $result;
     }
 
     /**

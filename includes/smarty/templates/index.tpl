@@ -3,11 +3,11 @@
 <head>
     <title>Товары</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link href="/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="/css/bootstrap-table.min.css" rel="stylesheet" />
+    <link href="./css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./css/bootstrap-table.min.css" rel="stylesheet" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/bootstrap-table.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/bootstrap-table.js"></script>
 </head>
 <body id="top" class="page">
 <div class="header"></div>
@@ -27,7 +27,7 @@
 <script>
     $(document).ready(function() {
         $('#products-table').bootstrapTable({
-            url:             '/',
+            url:             './',
             method:          'post',
             queryParams:     { get_products: 1 },
             queryParamsType: 'limit',
@@ -73,7 +73,7 @@
             passed = false;
         }
         if (passed) {
-            $.post('/', $(this).serialize() + '&make_order=1', function (data) {
+            $.post('./', $(this).serialize() + '&make_order=1', function (data) {
                 $('#modal-popup').modal('hide');
                 alert('Ваш заказ #' + data['order_id'] + ' успешно принят.');
             }, 'json');
