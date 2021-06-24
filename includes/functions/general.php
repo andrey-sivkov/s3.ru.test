@@ -3,7 +3,7 @@
 /**
  * Транслитерация
  * @param $text
- * @return mixed
+ * @return string
  */
 function transliterate($text) {
     $replace = [
