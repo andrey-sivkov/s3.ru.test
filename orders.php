@@ -1,5 +1,5 @@
 <?php
-require_once('includes/application_top.php');
+require_once 'includes/application_top.php';
 
 if (!empty($_POST['get_orders'])) {
     $orders = Order::getOrdersList();
@@ -10,12 +10,10 @@ if (!empty($_POST['get_orders'])) {
 }
 
 if (!empty($_GET['id'])) {
-    assign_to_Smarty('order', Order::getOrderInfo($_GET['id']));
-    assign_to_Smarty('orders_statuses', Order::getOrdersStatusesList());
+    $Smarty->assign('order', Order::getOrderInfo($_GET['id']));
+    $Smarty->assign('orders_statuses', Order::getOrdersStatusesList());
 }
 
-$page = fetch_to_Smarty(DIR_FS_SMARTY . '/templates/orders.tpl');
+echo $Smarty->fetch(DIR_FS_SMARTY . '/templates/orders.tpl');
 
-require_once('includes/application_bottom.php');
-
-die($page);
+require_once 'includes/application_bottom.php';
