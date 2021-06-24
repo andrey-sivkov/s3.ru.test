@@ -5,14 +5,18 @@ class Product {
      * @param $id
      * @return array
      */
-    public static function getProductInfo($id) {
-        return (array)select_row_to_DB("select * from products where id = '" . (int)$id . "'");
+    public static function getProductInfo($product_id) {
+        global $DB;
+
+        return $DB->query("select * from products where id = ?d", $product_id);
     }
 
     /**
      * @return array
      */
     public static function getProductsList() {
-        return (array)select_to_DB("select * from products order by name");
+        global $DB;
+
+        return $DB->query("select * from products order by name");
     }
 }
