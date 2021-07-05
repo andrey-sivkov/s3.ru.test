@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class Order
+ */
 class Order
 {
 
@@ -82,7 +86,7 @@ class Order
     {
         global $DB;
 
-        $order_total_sum = select_cell_to_DB("select sum(product_price * product_quantity) 
+        $order_total_sum = $DB->selectCell("select sum(product_price * product_quantity) 
                                                 from orders_products 
                                                 where order_id = '" . (int)$order_id . "'");
 
